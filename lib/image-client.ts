@@ -10,10 +10,19 @@
  */
 
 export const CLIENT_TARGET_BYTES = 20_000;
-const SIZES = [400, 340, 280, 220];
+// PNG (see comment on IMAGE_TYPE) is lossless: canvas.toBlob's quality
+// argument is ignored for image/png, so QUALITIES below is a no-op loop kept
+// only so the retry structure matches the server. Resolution is the only real
+// lever, hence the ladder reaching further down than it would for a lossy
+// format.
+const SIZES = [400, 340, 280, 220, 160, 120, 96, 64];
 const QUALITIES = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3];
 
 export type ClientImage = { dataUri: string; bytes: number; width: number; quality: number };
+
+/** PNG, matching the server: librsvg does not render embedded WebP <image>
+ *  elements, so the badge's image panel would be blank in any SVG rasterizer.
+ *  See lib/image-server.ts for the full explanation. */
 
 function drawCover(img: HTMLImageElement, size: number): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
@@ -28,6 +37,8 @@ function drawCover(img: HTMLImageElement, size: number): HTMLCanvasElement {
   return canvas;
 }
 
+const IMAGE_TYPE = "image/png";
+
 const toBlob = (canvas: HTMLCanvasElement, type: string, q: number) =>
   new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, q));
 
@@ -35,7 +46,7 @@ async function encodeUnderBudget(img: HTMLImageElement, budget: number): Promise
   for (const size of SIZES) {
     const canvas = drawCover(img, size);
     for (const quality of QUALITIES) {
-      const blob = await toBlob(canvas, "image/webp", quality);
+      const blob = await toBlob(canvas, IMAGE_TYPE, quality);
       if (blob && blob.size <= budget) {
         const dataUri = await new Promise<string>((resolve) => {
           const r = new FileReader();

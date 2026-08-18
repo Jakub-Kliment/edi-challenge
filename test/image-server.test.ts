@@ -15,8 +15,12 @@ describe("image pipeline", () => {
   it("brings a large photo under the byte budget", async () => {
     const out = await processImage(await makeImage(2400, 1600));
     assert.ok(out.bytes.length <= TARGET_BYTES, `got ${out.bytes.length}`);
-    assert.equal(out.mimeId, 0);
-    assert.equal(out.mime, "image/webp");
+    // PNG, not WebP: librsvg does not decode WebP embedded in an SVG <image>
+    // element (verified by minting and rendering a real badge — D22 in
+    // DECISIONS.md), so the badge's photo panel would be silently blank in
+    // any SVG-based renderer despite the bytes being stored correctly.
+    assert.equal(out.mimeId, 1);
+    assert.equal(out.mime, "image/png");
     console.log(`\n  2400x1600 -> ${out.width}px q${out.quality}, ${out.bytes.length} bytes`);
   });
 

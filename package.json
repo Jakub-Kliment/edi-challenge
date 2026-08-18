@@ -9,9 +9,10 @@
     "start": "next start",
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "deploy:amoy": "hardhat run scripts/deploy.ts --network amoy",
+    "deploy:amoy": "bash -c 'set -a; source .env; set +a; hardhat run scripts/deploy.ts --network amoy'",
     "gen:solidity": "tsx scripts/gen-solidity-parts.ts",
-    "gen:abi": "tsx scripts/gen-abi.ts"
+    "gen:abi": "tsx scripts/gen-abi.ts",
+    "deploy:polygon": "bash -c 'set -a; source .env; set +a; hardhat run scripts/deploy.ts --network polygon'"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox-viem": "^5.0.7",

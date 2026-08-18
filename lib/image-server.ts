@@ -20,8 +20,13 @@ export const HARD_MAX_BYTES = 24_000;
 /** Policy target. Lower = cheaper mints. Adjustable without redeploying. */
 export const TARGET_BYTES = 20_000;
 
-const QUALITY_STEPS = [80, 70, 60, 50, 40, 30];
-const SIZE_STEPS = [400, 340, 280, 220];
+// PNG is lossless, so "quality" only controls encoder effort, not file size —
+// unlike WebP/JPEG there is no quality knob to trade against size. The only
+// lever that reliably shrinks a PNG is resolution, so that ladder needs to
+// reach further down for genuinely hard-to-compress images (fine texture,
+// grain, noise) to still degrade gracefully instead of hard-failing.
+const QUALITY_STEPS = [9]; // sharp's PNG compressionLevel; kept as a loop for symmetry with the size ladder
+const SIZE_STEPS = [400, 340, 280, 220, 160, 120, 96, 64];
 
 export class ImageProcessError extends Error {
   constructor(message: string, readonly code: "IMAGE_TOO_LARGE" | "IMAGE_INVALID") {
@@ -37,6 +42,16 @@ export type ProcessedImage = {
   width: number;
   quality: number;
 };
+
+/**
+ * PNG, not WebP, despite WebP compressing meaningfully smaller at equal
+ * quality. Verified directly: librsvg (which sharp uses to rasterize SVG, and
+ * which is representative of how NFT tooling renders on-chain SVG metadata)
+ * does not decode WebP embedded via <image href="data:image/webp;base64,...">
+ * — the panel renders blank, silently, with no error. PNG in the identical
+ * harness renders correctly. Found by minting a real badge and looking at the
+ * rendered output, not by reasoning about format support in the abstract.
+ */
 
 /**
  * @param input raw bytes of the user's image (any format sharp understands)
@@ -63,11 +78,11 @@ export async function processImage(input: Buffer, budget = TARGET_BYTES): Promis
           fit: "cover",          // fill the square, never distort
           position: "attention", // crop toward the most salient region
         })
-        .webp({ quality, effort: 6 })
+        .png({ compressionLevel: quality, effort: 10 })
         .toBuffer();
 
       if (bytes.length <= budget) {
-        return { bytes, mimeId: 0, mime: "image/webp", width, quality };
+        return { bytes, mimeId: 1, mime: "image/png", width, quality };
       }
     }
   }
