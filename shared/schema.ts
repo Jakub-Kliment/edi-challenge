@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FIELD_LIMITS } from "./badge-template.js";
+import { FIELD_LIMITS } from "@/shared/badge-template";
 
 /**
  * One schema, used by both the browser form and the API route.
