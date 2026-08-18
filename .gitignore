@@ -1,0 +1,28 @@
+# Secrets — MUST be first, before any commit
+.env
+.env.*
+!.env.example
+
+# deps
+node_modules/
+# next
+.next/
+out/
+build/
+# hardhat
+artifacts/
+cache/
+typechain-types/
+# vercel
+.vercel
+# misc
+.DS_Store
+*.log
+
+# Private interview prep — NOT part of the public submission
+DECISIONS.md
+PROCESS.md
+
+# ELCA's challenge brief — their document, not mine to republish.
+# (Contains examiner wallet + internal email addresses; repo is public.)
+*.pdf
