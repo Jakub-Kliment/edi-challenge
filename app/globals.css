@@ -110,6 +110,25 @@ body {
 .netbar { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--muted); margin-bottom: 20px; }
 .netbar .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
 .netbar select { background: var(--surface); color: var(--text); border: 1px solid var(--hairline); border-radius: 6px; padding: 4px 8px; font-size: 11px; font-family: inherit; }
+.netbar .dot.dot-warn { background: var(--warn); }
+.netbar-note { color: var(--warn); font-size: 11px; }
 
 .spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: -2px; margin-right: 7px; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Crop modal (Bonus A) */
+.crop-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(4, 10, 18, .82); backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.crop-panel {
+  width: 100%; max-width: 440px; background: var(--surface);
+  border: 1px solid var(--hairline); border-radius: var(--radius);
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.crop-stage { position: relative; width: 100%; height: 360px; background: #000; }
+.crop-controls { padding: 16px 18px; }
+.crop-zoom-label { display: flex; align-items: center; gap: 10px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.crop-zoom-label input[type="range"] { flex: 1; accent-color: var(--accent); }
+.crop-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }

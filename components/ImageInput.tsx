@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { processFile, processUrl, type ClientImage } from "@/lib/image-client";
+import { processUrl, type ClientImage } from "@/lib/image-client";
+import { CropModal } from "@/components/CropModal";
 
 /**
  * Image source: a link, or a file the user picks.
@@ -26,6 +27,7 @@ export function ImageInput({
   const [busy, setBusy] = useState(false);
   const [hot, setHot] = useState(false);
   const [localError, setLocalError] = useState<string>();
+  const [cropSrc, setCropSrc] = useState<string>();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleUrl = async (value: string) => {
@@ -38,18 +40,30 @@ export function ImageInput({
     setBusy(false);
   };
 
-  const handleFile = async (file: File) => {
-    setBusy(true);
+  /**
+   * Uploaded files go through the crop modal (Bonus A: the user chooses
+   * where the square lands, rather than an automatic centre-crop). Pasted
+   * links skip it — asking someone to crop a photo they don't control the
+   * source of is unnecessary friction, and processUrl()'s automatic
+   * attention-weighted crop (server-side) already handles arbitrary
+   * aspect ratios reasonably.
+   */
+  const handleFile = (file: File) => {
     setLocalError(undefined);
-    try {
-      onImage(await processFile(file));
-      onUrl("");
-    } catch (e) {
-      setLocalError((e as Error).message);
-      onImage(null);
-    } finally {
-      setBusy(false);
-    }
+    const reader = new FileReader();
+    reader.onload = () => setCropSrc(reader.result as string);
+    reader.onerror = () => setLocalError("Could not read that file.");
+    reader.readAsDataURL(file);
+  };
+
+  const handleCropDone = (img: ClientImage) => {
+    // Deliberately does NOT call onUrl("") — the parent treats an empty URL
+    // as "clear the image" (see app/page.tsx), so calling both onImage and
+    // onUrl in the same tick let the URL clear race the image set and silently
+    // wipe it out. Upload mode never touches the URL field in the first
+    // place, so there is nothing to clear here.
+    onImage(img);
+    setCropSrc(undefined);
   };
 
   return (
@@ -110,6 +124,14 @@ export function ImageInput({
         </div>
       )}
       {busy && mode === "link" && <div className="imgstat"><span>checking image…</span></div>}
+
+      {cropSrc && (
+        <CropModal
+          imageSrc={cropSrc}
+          onDone={handleCropDone}
+          onCancel={() => setCropSrc(undefined)}
+        />
+      )}
     </div>
   );
 }

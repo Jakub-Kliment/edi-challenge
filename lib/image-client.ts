@@ -92,3 +92,38 @@ export async function processUrl(url: string, budget = CLIENT_TARGET_BYTES): Pro
     return null; // CORS or unreachable: server-side fetch will handle it
   }
 }
+
+/**
+ * Crop a source image to the user-chosen rectangle (from react-easy-crop),
+ * then run it through the same encode-under-budget loop as everything else.
+ *
+ * This is what Bonus A actually asks for: the automatic cover-fit crop in
+ * processFile()/processUrl() picks a sensible default, but "manage the
+ * functions of autoscaling, cropping etc." implies the user gets to choose
+ * where the crop lands — a centre-crop can decapitate a portrait photo.
+ */
+export async function processCroppedArea(
+  imageSrc: string,
+  area: { x: number; y: number; width: number; height: number },
+  budget = CLIENT_TARGET_BYTES,
+): Promise<ClientImage> {
+  // No crossOrigin here: imageSrc is always a data: URI at this call site
+  // (from FileReader in ImageInput), never a remote URL, so there is no
+  // cross-origin request to authorize. Setting crossOrigin on a data: URI
+  // <img> is a known source of silent hangs in some engines.
+  const img = await load(imageSrc);
+  // Draw only the selected rectangle into a fresh canvas at output resolution,
+  // then hand it to the same size/quality ladder every other path uses.
+  const source = document.createElement("canvas");
+  source.width = area.width;
+  source.height = area.height;
+  const sctx = source.getContext("2d")!;
+  sctx.drawImage(img, area.x, area.y, area.width, area.height, 0, 0, area.width, area.height);
+
+  // encodeUnderBudget expects an <img>-like source it can re-draw with
+  // cover-fit; since the crop is already the exact square the user chose,
+  // wrap it back into an Image so the existing ladder can resize it down.
+  const croppedDataUri = source.toDataURL("image/png");
+  const croppedImg = await load(croppedDataUri);
+  return encodeUnderBudget(croppedImg, budget);
+}

@@ -18,6 +18,13 @@ const PLACEHOLDER_IMAGE =
 
 const today = () => new Date().toISOString().slice(0, 10);
 
+// Reflects the actual state of the relayer, not just a feature flag: the
+// mainnet contract has been deliberately left undeployed and unfunded (see
+// DECISIONS.md) rather than spending real POL to complete a bonus feature.
+// NEXT_PUBLIC_* vars are inlined by Next at build time, so this is safe to
+// read directly.
+const MAINNET_ENABLED = process.env.NEXT_PUBLIC_MAINNET_ENABLED === "true";
+
 export default function Home() {
   const [form, setForm] = useState({
     firstName: "",
@@ -68,6 +75,7 @@ export default function Home() {
   const hasImage = Boolean(image) || (/^https:\/\/.+/.test(imageUrl) && imageChecked);
   const canMint =
     !minting &&
+    (chain === "amoy" || MAINNET_ENABLED) &&
     form.firstName.trim() &&
     form.lastName.trim() &&
     form.mainProject.trim() &&
@@ -117,12 +125,18 @@ export default function Home() {
       </header>
 
       <div className="netbar">
-        <span className="dot" />
+        <span className={`dot ${chain === "polygon" && !MAINNET_ENABLED ? "dot-warn" : ""}`} />
         <span>Network</span>
         <select value={chain} onChange={(e) => setChain(e.target.value as "amoy" | "polygon")}>
           <option value="amoy">Polygon Amoy (testnet)</option>
-          <option value="polygon">Polygon (mainnet)</option>
+          <option value="polygon">Polygon (mainnet){MAINNET_ENABLED ? "" : " — not yet funded"}</option>
         </select>
+        {chain === "polygon" && !MAINNET_ENABLED && (
+          <span className="netbar-note">
+            The mainnet contract exists in code but has not been deployed or funded with real POL.
+            Minting will not work on this network yet — switch to Amoy to try the app.
+          </span>
+        )}
       </div>
 
       <div className="columns">
@@ -195,7 +209,9 @@ export default function Home() {
             </button>
             {!canMint && !minting && (
               <p className="hint" style={{ marginTop: 10, marginBottom: 0, textAlign: "center" }}>
-                Fill in every field and choose an image to continue.
+                {chain === "polygon" && !MAINNET_ENABLED
+                  ? "Mainnet is not funded yet — switch to Amoy to mint."
+                  : "Fill in every field and choose an image to continue."}
               </p>
             )}
 

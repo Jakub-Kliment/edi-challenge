@@ -34,3 +34,4 @@ next-env.d.ts
 # Next.js writes these on dev start; disabled via agentRules but belt-and-braces
 AGENTS.md
 /CLAUDE.md
+.env*
