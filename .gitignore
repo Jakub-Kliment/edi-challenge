@@ -26,3 +26,7 @@ PROCESS.md
 # ELCA's challenge brief — their document, not mine to republish.
 # (Contains examiner wallet + internal email addresses; repo is public.)
 *.pdf
+
+# TS build cache
+tsconfig.tsbuildinfo
+next-env.d.ts

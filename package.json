@@ -10,7 +10,8 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "deploy:amoy": "hardhat run scripts/deploy.ts --network amoy",
-    "gen:solidity": "tsx scripts/gen-solidity-parts.ts"
+    "gen:solidity": "tsx scripts/gen-solidity-parts.ts",
+    "gen:abi": "tsx scripts/gen-abi.ts"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox-viem": "^5.0.7",
@@ -21,7 +22,14 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.6.1",
-    "solady": "^0.1.26"
+    "ipaddr.js": "^2.5.0",
+    "next": "^16.3.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "sharp": "^0.35.3",
+    "solady": "^0.1.26",
+    "viem": "^2.55.18",
+    "zod": "^3.25.76"
   },
   "type": "module"
 }
