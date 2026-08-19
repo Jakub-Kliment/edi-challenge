@@ -176,7 +176,7 @@ contract ExitBadge is ERC721, Ownable {
             '[{"trait_type":"Project","value":"', b.mainProject, '"},',
             '{"trait_type":"Start Date","value":"', b.startDate, '"},',
             '{"trait_type":"Completion Date","value":"', b.completionDate, '"},',
-            '{"trait_type":"Recipient","value":"', b.firstName, " ", b.lastName, '"},',
+            '{"trait_type":"Awarded To","value":"', b.firstName, " ", b.lastName, '"},',
             '{"trait_type":"Storage","value":"Fully On-Chain"}]'
         );
     }

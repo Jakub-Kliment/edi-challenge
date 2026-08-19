@@ -6,7 +6,7 @@ badge" to any wallet address — no wallet connection, login, or gas required
 from the user.
 
 **Live app:** https://edi-badge-minter.vercel.app
-**Contract (Polygon Amoy testnet):** `0x9b3aE52F3d5266A06C069EAf3aC050D6E13Fb696`
+**Contract (Polygon Amoy testnet):** `0x9C90eF633B6c12Cc37191b3C92253038a48CAB35`
 
 ## How it works
 
