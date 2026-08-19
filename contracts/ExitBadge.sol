@@ -201,14 +201,13 @@ contract ExitBadge is ERC721, Ownable {
             '<text x="60" y="615" fill="url(#chrome)" font-family="Arial Black,Helvetica,sans-serif" font-weight="900" font-size="40" letter-spacing="1">',
             b.firstName, " ", b.lastName,
             "</text>",
-            '<text x="60" y="646" fill="#ffd66b" font-family="Menlo,Consolas,monospace" font-size="17" letter-spacing="2">// ',
+            '<text x="60" y="646" fill="#ffd66b" font-family="Menlo,Consolas,monospace" font-size="17" letter-spacing="2">',
             b.mainProject,
             "</text>",
             '<text x="60" y="676" fill="#c9a8e0" font-family="Menlo,Consolas,monospace" font-size="14">',
             b.startDate, " :: ", b.completionDate,
             "</text>",
             _svgDetails(b),
-            '<text x="60" y="784" fill="#20e3c2" font-family="Menlo,Consolas,monospace" font-size="11" letter-spacing="2">POLYGON // ERC-721 // FULLY ON-CHAIN</text>',
             "</svg>"
         );
     }

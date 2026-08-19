@@ -175,10 +175,9 @@ export function buildSVG(data: BadgeData): string {
     data.imageDataUri,
     `"/>`,
     `<text x="60" y="615" fill="url(#chrome)" font-family="Arial Black,Helvetica,sans-serif" font-weight="900" font-size="40" letter-spacing="1">${first} ${last}</text>`,
-    `<text x="60" y="646" fill="${PALETTE.sunCore}" font-family="Menlo,Consolas,monospace" font-size="17" letter-spacing="2">// ${project}</text>`,
+    `<text x="60" y="646" fill="${PALETTE.sunCore}" font-family="Menlo,Consolas,monospace" font-size="17" letter-spacing="2">${project}</text>`,
     `<text x="60" y="676" fill="${PALETTE.muted}" font-family="Menlo,Consolas,monospace" font-size="14">${start} :: ${end}</text>`,
     detailSvg,
-    `<text x="60" y="784" fill="${PALETTE.grid}" font-family="Menlo,Consolas,monospace" font-size="11" letter-spacing="2">POLYGON // ERC-721 // FULLY ON-CHAIN</text>`,
     `</svg>`,
   ].join("");
 }
