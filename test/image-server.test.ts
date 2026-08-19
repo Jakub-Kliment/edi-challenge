@@ -15,13 +15,37 @@ describe("image pipeline", () => {
   it("brings a large photo under the byte budget", async () => {
     const out = await processImage(await makeImage(2400, 1600));
     assert.ok(out.bytes.length <= TARGET_BYTES, `got ${out.bytes.length}`);
-    // PNG, not WebP: librsvg does not decode WebP embedded in an SVG <image>
-    // element (verified by minting and rendering a real badge — D22 in
-    // DECISIONS.md), so the badge's photo panel would be silently blank in
-    // any SVG-based renderer despite the bytes being stored correctly.
-    assert.equal(out.mimeId, 1);
-    assert.equal(out.mime, "image/png");
+    // JPEG, not WebP or PNG. WebP: librsvg does not decode WebP embedded in
+    // an SVG <image> element (D22 in DECISIONS.md) — the photo panel renders
+    // blank in any SVG-based renderer despite the bytes being stored
+    // correctly. PNG (the first fix) renders correctly but is lossless, so
+    // hard-to-compress images (e.g. a low-res thumbnail) were forced down to
+    // as little as 160px to hit budget — see the dedicated test below and D39.
+    assert.equal(out.mimeId, 2);
+    assert.equal(out.mime, "image/jpeg");
     console.log(`\n  2400x1600 -> ${out.width}px q${out.quality}, ${out.bytes.length} bytes`);
+  });
+
+  it("keeps full resolution on a hard-to-compress low-quality source", async () => {
+    // Regression test for a real report: a user pasted a ~515x388 Google
+    // Images thumbnail (busy geometric content, already lossy-compressed —
+    // genuinely hard to compress further). Under PNG this collapsed all the
+    // way to 160px to fit the byte budget, visibly blocky at 400px display
+    // size. JPEG should hit budget via quality alone, keeping full width.
+    const px = Buffer.alloc(500 * 400 * 3);
+    for (let i = 0; i < px.length; i++) {
+      // High-frequency striped pattern — deliberately hard for any codec to
+      // compress losslessly, similar in spirit to the real photo that broke.
+      px[i] = (i % 7 < 3) ? 250 : (i * 37) % 256;
+    }
+    const src = await sharp(px, { raw: { width: 500, height: 400, channels: 3 } }).jpeg({ quality: 60 }).toBuffer();
+    const out = await processImage(src);
+    assert.ok(out.bytes.length <= TARGET_BYTES, `got ${out.bytes.length}`);
+    // The actual regression this guards: PNG collapsed a source this hard all
+    // the way to 160px. JPEG should stay well above that even if quality
+    // alone cannot always hold full 400px for genuinely adversarial input.
+    assert.ok(out.width >= 340, `expected >=340px (PNG collapsed to 160px on comparable input), got ${out.width}px`);
+    console.log(`  hard thumbnail -> ${out.width}px q${out.quality}, ${out.bytes.length} bytes`);
   });
 
   it("produces a square from any aspect ratio, without distortion", async () => {

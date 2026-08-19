@@ -186,49 +186,37 @@ contract ExitBadge is ERC721, Ownable {
     /// @dev Mirrors shared/badge-template.ts byte for byte. A test decodes this
     /// output and string-compares it against the TypeScript implementation, so
     /// the live preview and the minted badge cannot silently diverge.
+    ///
+    /// The header below (gradients, sun, perspective grid floor, chrome frame)
+    /// is fixed for every badge -- it does not depend on any stored field --
+    /// so it is one literal rather than assembled at read time. Generated
+    /// from the real buildSVG() output (scripted, not hand-transcribed) to
+    /// rule out a copy error; see DECISIONS.md D33.
     function _buildSVG(Badge storage b) private view returns (string memory) {
         return string.concat(
-            '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800" viewBox="0 0 600 800">',
-            '<rect width="600" height="800" fill="#0B1A2F"/>',
-            '<rect x="0" y="0" width="600" height="8" fill="#E2001A"/>',
-            '<text x="60" y="70" fill="#F5F7FA" font-family="Helvetica,Arial,sans-serif" font-size="13" letter-spacing="3">COMPLETION BADGE</text>',
-            '<line x1="60" y1="96" x2="540" y2="96" stroke="#1E3A5F" stroke-width="1"/>',
-            '<rect x="98" y="130" width="404" height="404" fill="#122A47"/>',
-            _svgImage(b),
-            _svgText(b),
+            "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"600\" height=\"800\" viewBox=\"0 0 600 800\"><defs><linearGradient id=\"sky\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#2b1055\"/><stop offset=\"0.55\" stop-color=\"#7c1f6e\"/><stop offset=\"1\" stop-color=\"#ff6b6b\"/></linearGradient><radialGradient id=\"sun\" cx=\"0.5\" cy=\"0.5\" r=\"0.5\"><stop offset=\"0\" stop-color=\"#ffd66b\"/><stop offset=\"1\" stop-color=\"#ff5f9e\"/></radialGradient><linearGradient id=\"chrome\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\"><stop offset=\"0\" stop-color=\"#ff8bd6\"/><stop offset=\"1\" stop-color=\"#7ee8ff\"/></linearGradient><clipPath id=\"floorClip\"><rect x=\"0\" y=\"712\" width=\"600\" height=\"88\"/></clipPath></defs><rect width=\"600\" height=\"800\" fill=\"url(#sky)\"/><circle cx=\"300\" cy=\"120\" r=\"155\" fill=\"url(#sun)\" opacity=\"0.92\"/><g clip-path=\"url(#floorClip)\"><rect x=\"0\" y=\"712\" width=\"600\" height=\"88\" fill=\"#0f3d52\"/><line x1=\"0\" y1=\"712\" x2=\"600\" y2=\"712\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.15\"/><line x1=\"0\" y1=\"718\" x2=\"600\" y2=\"718\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.18\"/><line x1=\"0\" y1=\"726\" x2=\"600\" y2=\"726\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.23\"/><line x1=\"0\" y1=\"738\" x2=\"600\" y2=\"738\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.30\"/><line x1=\"0\" y1=\"754\" x2=\"600\" y2=\"754\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.39\"/><line x1=\"0\" y1=\"776\" x2=\"600\" y2=\"776\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.51\"/><line x1=\"0\" y1=\"800\" x2=\"600\" y2=\"800\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.65\"/><line x1=\"-300\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"-240\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"-180\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"-120\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"-60\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"0\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"60\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"120\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"180\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"240\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"300\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"360\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"420\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"480\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"540\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"600\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"660\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"720\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"780\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"840\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/><line x1=\"900\" y1=\"800\" x2=\"300\" y2=\"706\" stroke=\"#20e3c2\" stroke-width=\"1\" opacity=\"0.35\"/></g><rect x=\"0\" y=\"0\" width=\"600\" height=\"6\" fill=\"url(#chrome)\"/><rect x=\"0\" y=\"6\" width=\"600\" height=\"46\" fill=\"#2b1055\" opacity=\"0.55\"/><text x=\"60\" y=\"36\" fill=\"#fdf4ff\" font-family=\"Arial Black,Helvetica,sans-serif\" font-weight=\"900\" font-size=\"15\" letter-spacing=\"6\">COMPLETION BADGE</text><rect x=\"94\" y=\"142\" width=\"412\" height=\"412\" fill=\"none\" stroke=\"url(#chrome)\" stroke-width=\"3\"/><rect x=\"98\" y=\"146\" width=\"404\" height=\"404\" fill=\"#1a0b33\"/><image x=\"100\" y=\"148\" width=\"400\" height=\"400\" preserveAspectRatio=\"xMidYMid slice\" href=\"",
+            "data:", _mime(b.imageMime), ";base64,",
+            Base64.encode(SSTORE2.read(b.imagePointer)),
+            '"/>',
+            '<text x="60" y="615" fill="url(#chrome)" font-family="Arial Black,Helvetica,sans-serif" font-weight="900" font-size="40" letter-spacing="1">',
+            b.firstName, " ", b.lastName,
+            "</text>",
+            '<text x="60" y="646" fill="#ffd66b" font-family="Menlo,Consolas,monospace" font-size="17" letter-spacing="2">// ',
+            b.mainProject,
+            "</text>",
+            '<text x="60" y="676" fill="#c9a8e0" font-family="Menlo,Consolas,monospace" font-size="14">',
+            b.startDate, " :: ", b.completionDate,
+            "</text>",
             _svgDetails(b),
-            '<text x="60" y="770" fill="#1E3A5F" font-family="Helvetica,Arial,sans-serif" font-size="12" letter-spacing="2">POLYGON \xc2\xb7 ERC-721 \xc2\xb7 FULLY ON-CHAIN</text>',
+            '<text x="60" y="784" fill="#20e3c2" font-family="Menlo,Consolas,monospace" font-size="11" letter-spacing="2">POLYGON // ERC-721 // FULLY ON-CHAIN</text>',
             "</svg>"
         );
     }
 
-    /// @dev Split out to keep each function's stack frame shallow.
-    function _svgImage(Badge storage b) private view returns (string memory) {
-        return string.concat(
-            '<image x="100" y="132" width="400" height="400" preserveAspectRatio="xMidYMid slice" href="data:',
-            _mime(b.imageMime),
-            ";base64,",
-            Base64.encode(SSTORE2.read(b.imagePointer)),
-            '"/>'
-        );
-    }
-
-    function _svgText(Badge storage b) private view returns (string memory) {
-        return string.concat(
-            '<text x="60" y="600" fill="#F5F7FA" font-family="Helvetica,Arial,sans-serif" font-size="38" font-weight="bold">',
-            b.firstName, " ", b.lastName,
-            '</text>',
-            '<text x="60" y="634" fill="#E2001A" font-family="Helvetica,Arial,sans-serif" font-size="18" letter-spacing="1">',
-            b.mainProject,
-            '</text>',
-            '<text x="60" y="666" fill="#8FA3BF" font-family="Helvetica,Arial,sans-serif" font-size="15">',
-            b.startDate, " \xe2\x86\x92 ", b.completionDate,
-            '</text>'
-        );
-    }
-
-    /// @dev Wraps `details` onto up to 3 lines of <=42 chars. Mirrors
-    /// wrapDetails() in shared/badge-template.ts.
+    /// @dev Wraps `details` onto up to 2 lines of <=42 chars, mirroring
+    /// wrapDetails(text, 42, 2) in shared/badge-template.ts. Capped at 2
+    /// (not 3, as in the earlier design) so the text never reaches the
+    /// perspective grid floor starting at y=712.
     function _svgDetails(Badge storage b) private view returns (string memory) {
         bytes memory d = bytes(b.details);
         if (d.length == 0) return "";
@@ -238,7 +226,7 @@ contract ExitBadge is ERC721, Ownable {
         uint256 lastSpace;
         uint256 lines;
 
-        for (uint256 i; i < d.length && lines < 3; ++i) {
+        for (uint256 i; i < d.length && lines < 2; ++i) {
             if (d[i] == 0x20) lastSpace = i;
             bool tooLong = i - lineStart >= 42;
             bool atEnd = i == d.length - 1;
@@ -257,10 +245,10 @@ contract ExitBadge is ERC721, Ownable {
 
     function _detailLine(string memory text, uint256 index) private pure returns (string memory) {
         return string.concat(
-            '<text x="60" y="', (700 + index * 22).toString(),
-            '" fill="#8FA3BF" font-family="Helvetica,Arial,sans-serif" font-size="16">',
+            '<text x="60" y="', (690 + index * 20).toString(),
+            '" fill="#c9a8e0" font-family="Menlo,Consolas,monospace" font-size="14">',
             text,
-            '</text>'
+            "</text>"
         );
     }
 

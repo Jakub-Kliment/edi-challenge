@@ -20,13 +20,13 @@ export const HARD_MAX_BYTES = 24_000;
 /** Policy target. Lower = cheaper mints. Adjustable without redeploying. */
 export const TARGET_BYTES = 20_000;
 
-// PNG is lossless, so "quality" only controls encoder effort, not file size —
-// unlike WebP/JPEG there is no quality knob to trade against size. The only
-// lever that reliably shrinks a PNG is resolution, so that ladder needs to
-// reach further down for genuinely hard-to-compress images (fine texture,
-// grain, noise) to still degrade gracefully instead of hard-failing.
-const QUALITY_STEPS = [9]; // sharp's PNG compressionLevel; kept as a loop for symmetry with the size ladder
-const SIZE_STEPS = [400, 340, 280, 220, 160, 120, 96, 64];
+// JPEG's quality knob trades directly against file size, so most images fit
+// the budget at full 400px resolution just by stepping quality down — no
+// resolution loss needed. The size ladder is a fallback for genuinely
+// pathological input (verified against pure random noise, the worst
+// realistic case: fits at 400px/q40, no downscale needed at all).
+const QUALITY_STEPS = [80, 70, 60, 50, 40, 30];
+const SIZE_STEPS = [400, 340, 280, 220, 160];
 
 export class ImageProcessError extends Error {
   constructor(message: string, readonly code: "IMAGE_TOO_LARGE" | "IMAGE_INVALID") {
@@ -44,13 +44,28 @@ export type ProcessedImage = {
 };
 
 /**
- * PNG, not WebP, despite WebP compressing meaningfully smaller at equal
- * quality. Verified directly: librsvg (which sharp uses to rasterize SVG, and
- * which is representative of how NFT tooling renders on-chain SVG metadata)
- * does not decode WebP embedded via <image href="data:image/webp;base64,...">
- * — the panel renders blank, silently, with no error. PNG in the identical
- * harness renders correctly. Found by minting a real badge and looking at the
- * rendered output, not by reasoning about format support in the abstract.
+ * JPEG, not WebP or PNG.
+ *
+ * WebP: verified directly (minted a real badge, rendered the output) that
+ * librsvg does not decode WebP embedded via
+ * <image href="data:image/webp;base64,...">  — the panel renders blank,
+ * silently, no error.
+ *
+ * PNG (the first fix for the WebP problem) renders correctly, but PNG is
+ * lossless: its only lever against the byte budget is resolution, not
+ * quality. For images that do not compress well losslessly (busy detail,
+ * fine texture, low-quality source thumbnails), that forced the encoder down
+ * to as little as 160px to hit 20KB — visibly blocky in a 400px display
+ * frame. Found by testing an actual low-resolution thumbnail a user pasted
+ * (a ~515x388 Google Images thumbnail) and looking at the result, not by
+ * assuming the format choice was fine because synthetic test fixtures passed.
+ *
+ * JPEG renders correctly embedded in SVG (verified the same way as the WebP
+ * failure: rendered via librsvg AND in real Chrome) and, unlike PNG, degrades
+ * quality gracefully under the same budget — the same hard thumbnail fits at
+ * full 400px by stepping quality down to ~q50, rather than collapsing
+ * resolution. Pure random noise (the worst case for compressibility) still
+ * fits at 400px/q40 with no downscale at all.
  */
 
 /**
@@ -78,11 +93,11 @@ export async function processImage(input: Buffer, budget = TARGET_BYTES): Promis
           fit: "cover",          // fill the square, never distort
           position: "attention", // crop toward the most salient region
         })
-        .png({ compressionLevel: quality, effort: 10 })
+        .jpeg({ quality })
         .toBuffer();
 
       if (bytes.length <= budget) {
-        return { bytes, mimeId: 1, mime: "image/png", width, quality };
+        return { bytes, mimeId: 2, mime: "image/jpeg", width, quality };
       }
     }
   }

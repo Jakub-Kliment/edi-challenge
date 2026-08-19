@@ -2,7 +2,6 @@
 
 import { useMemo, useState, useDeferredValue } from "react";
 import { BadgePreview } from "@/components/BadgePreview";
-import { RecipientField } from "@/components/RecipientField";
 import { ImageInput } from "@/components/ImageInput";
 import type { ClientImage } from "@/lib/image-client";
 import { FIELD_LIMITS, type BadgeData } from "@/shared/badge-template";
@@ -117,130 +116,129 @@ export default function Home() {
       <div className="accent-rule" />
       <header className="masthead">
         <h1>On-chain completion badges</h1>
-        <p>
-          Fill in the details, and a badge is minted as an ERC-721 and sent to whichever wallet you
-          choose. You do not need a wallet, an account, or any POL — the badge, including its
-          artwork, is stored entirely on Polygon.
-        </p>
       </header>
 
-      <div className="netbar">
-        <span className={`dot ${chain === "polygon" && !MAINNET_ENABLED ? "dot-warn" : ""}`} />
-        <span>Network</span>
-        <select value={chain} onChange={(e) => setChain(e.target.value as "amoy" | "polygon")}>
-          <option value="amoy">Polygon Amoy (testnet)</option>
-          <option value="polygon">Polygon (mainnet){MAINNET_ENABLED ? "" : " — not yet funded"}</option>
-        </select>
+      <div className="switch-row">
+        <div className="net-switch" role="tablist" aria-label="Network">
+          <span className={`net-switch-thumb ${chain === "polygon" ? "on-mainnet" : ""}`} />
+          <button
+            type="button"
+            role="tab"
+            aria-selected={chain === "amoy"}
+            className={chain === "amoy" ? "active" : ""}
+            onClick={() => setChain("amoy")}
+          >
+            Amoy
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={chain === "polygon"}
+            className={chain === "polygon" ? "active" : ""}
+            onClick={() => setChain("polygon")}
+          >
+            Mainnet
+          </button>
+        </div>
         {chain === "polygon" && !MAINNET_ENABLED && (
-          <span className="netbar-note">
-            The mainnet contract exists in code but has not been deployed or funded with real POL.
-            Minting will not work on this network yet — switch to Amoy to try the app.
-          </span>
+          <span className="netbar-note">Not funded yet — switch to Amoy to mint.</span>
         )}
       </div>
 
       <div className="columns">
-        <div>
-          <section className="panel">
-            <h2>Recipient</h2>
-            <p className="hint">Who is this badge for?</p>
-            <div className="row">
-              <div className="field">
-                <label htmlFor="firstName">First name {counter("firstName")}</label>
-                <input id="firstName" value={form.firstName} maxLength={FIELD_LIMITS.firstName}
-                  onChange={(e) => set("firstName")(e.target.value)} />
-              </div>
-              <div className="field">
-                <label htmlFor="lastName">Last name {counter("lastName")}</label>
-                <input id="lastName" value={form.lastName} maxLength={FIELD_LIMITS.lastName}
-                  onChange={(e) => set("lastName")(e.target.value)} />
-              </div>
-            </div>
-            <RecipientField value={form.recipient} onChange={set("recipient")} />
-          </section>
-
-          <section className="panel">
-            <h2>The work</h2>
-            <p className="hint">What is being recognised.</p>
+        <div className="form-flow">
+          <div className="row">
             <div className="field">
-              <label htmlFor="mainProject">Main project {counter("mainProject")}</label>
-              <input id="mainProject" value={form.mainProject} maxLength={FIELD_LIMITS.mainProject}
-                onChange={(e) => set("mainProject")(e.target.value)} />
-            </div>
-            <div className="row">
-              <div className="field">
-                <label htmlFor="startDate">Start date</label>
-                <input id="startDate" type="date" value={form.startDate}
-                  onChange={(e) => set("startDate")(e.target.value)} />
-              </div>
-              <div className="field">
-                <label htmlFor="completionDate">Completion date</label>
-                <input id="completionDate" type="date" value={form.completionDate}
-                  onChange={(e) => set("completionDate")(e.target.value)} />
-              </div>
+              <label htmlFor="firstName">First name {counter("firstName")}</label>
+              <input id="firstName" value={form.firstName} maxLength={FIELD_LIMITS.firstName}
+                onChange={(e) => set("firstName")(e.target.value)} />
             </div>
             <div className="field">
-              <label htmlFor="details">Details {counter("details")}</label>
-              <textarea id="details" value={form.details} maxLength={FIELD_LIMITS.details}
-                placeholder="A sentence about what they did."
-                onChange={(e) => set("details")(e.target.value)} />
+              <label htmlFor="lastName">Last name {counter("lastName")}</label>
+              <input id="lastName" value={form.lastName} maxLength={FIELD_LIMITS.lastName}
+                onChange={(e) => set("lastName")(e.target.value)} />
             </div>
-          </section>
+          </div>
 
-          <section className="panel">
-            <h2>Artwork</h2>
-            <p className="hint">
-              The picture sits inside the badge. Everything around it is drawn from the details above.
+          <div className="field">
+            <label htmlFor="recipient">Recipient wallet</label>
+            <input id="recipient" className="mono" value={form.recipient}
+              placeholder="0x…"
+              onChange={(e) => set("recipient")(e.target.value)} />
+          </div>
+
+          <div className="field">
+            <label htmlFor="mainProject">Main project {counter("mainProject")}</label>
+            <input id="mainProject" value={form.mainProject} maxLength={FIELD_LIMITS.mainProject}
+              onChange={(e) => set("mainProject")(e.target.value)} />
+          </div>
+
+          <div className="row">
+            <div className="field">
+              <label htmlFor="startDate">Start date</label>
+              <input id="startDate" type="date" value={form.startDate}
+                onChange={(e) => set("startDate")(e.target.value)} />
+            </div>
+            <div className="field">
+              <label htmlFor="completionDate">Completion date</label>
+              <input id="completionDate" type="date" value={form.completionDate}
+                onChange={(e) => set("completionDate")(e.target.value)} />
+            </div>
+          </div>
+
+          <div className="field">
+            <label htmlFor="details">Details {counter("details")}</label>
+            <textarea id="details" value={form.details} maxLength={FIELD_LIMITS.details}
+              placeholder="A sentence about what they did."
+              onChange={(e) => set("details")(e.target.value)} />
+          </div>
+
+          <ImageInput
+            url={imageUrl}
+            onImage={(img) => { setImage(img); setImageChecked(true); }}
+            onUrl={(u) => {
+              setImageUrl(u);
+              if (!u) { setImage(null); setImageChecked(false); }
+            }}
+            bytes={image?.bytes ?? null}
+          />
+
+          <button className="mint" disabled={!canMint} onClick={mint}>
+            {minting ? <><span className="spinner" />Minting…</> : "Mint and send badge"}
+          </button>
+          {!canMint && !minting && (
+            <p className="hint" style={{ marginTop: 10, marginBottom: 0, textAlign: "center" }}>
+              {chain === "polygon" && !MAINNET_ENABLED
+                ? "Mainnet is not funded yet — switch to Amoy to mint."
+                : "Fill in every field and choose an image to continue."}
             </p>
-            <ImageInput
-              url={imageUrl}
-              onImage={(img) => { setImage(img); setImageChecked(true); }}
-              onUrl={(u) => {
-                setImageUrl(u);
-                if (!u) { setImage(null); setImageChecked(false); }
-              }}
-              bytes={image?.bytes ?? null}
-            />
-          </section>
+          )}
 
-          <section className="panel">
-            <button className="mint" disabled={!canMint} onClick={mint}>
-              {minting ? <><span className="spinner" />Minting…</> : "Mint and send badge"}
-            </button>
-            {!canMint && !minting && (
-              <p className="hint" style={{ marginTop: 10, marginBottom: 0, textAlign: "center" }}>
-                {chain === "polygon" && !MAINNET_ENABLED
-                  ? "Mainnet is not funded yet — switch to Amoy to mint."
-                  : "Fill in every field and choose an image to continue."}
-              </p>
-            )}
-
-            {result && (
-              <div className={`result ${result.ok ? "ok" : "bad"}`}>
-                {result.ok ? (
-                  <>
-                    <h3>
-                      {result.status === "confirmed"
-                        ? "Badge minted and sent"
-                        : "Badge submitted — confirming on-chain"}
-                    </h3>
-                    <dl>
-                      <dt>Token</dt><dd>#{result.tokenId}</dd>
-                      <dt>Image</dt><dd>{(result.imageBytes / 1024).toFixed(1)} KB on-chain</dd>
-                      {result.gasUsed && (<><dt>Gas</dt><dd>{Number(result.gasUsed).toLocaleString()}</dd></>)}
-                      <dt>Transaction</dt>
-                      <dd><a href={result.explorerUrl} target="_blank" rel="noreferrer">View on PolygonScan ↗</a></dd>
-                    </dl>
-                  </>
-                ) : (
-                  <>
-                    <h3>That did not work</h3>
-                    <p style={{ margin: 0, fontSize: 13 }}>{result.message}</p>
-                  </>
-                )}
-              </div>
-            )}
-          </section>
+          {result && (
+            <div className={`result ${result.ok ? "ok" : "bad"}`}>
+              {result.ok ? (
+                <>
+                  <h3>
+                    {result.status === "confirmed"
+                      ? "Badge minted and sent"
+                      : "Badge submitted — confirming on-chain"}
+                  </h3>
+                  <dl>
+                    <dt>Token</dt><dd>#{result.tokenId}</dd>
+                    <dt>Image</dt><dd>{(result.imageBytes / 1024).toFixed(1)} KB on-chain</dd>
+                    {result.gasUsed && (<><dt>Gas</dt><dd>{Number(result.gasUsed).toLocaleString()}</dd></>)}
+                    <dt>Transaction</dt>
+                    <dd><a href={result.explorerUrl} target="_blank" rel="noreferrer">View on PolygonScan ↗</a></dd>
+                  </dl>
+                </>
+              ) : (
+                <>
+                  <h3>That did not work</h3>
+                  <p style={{ margin: 0, fontSize: 13 }}>{result.message}</p>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         <BadgePreview data={badgeData} />

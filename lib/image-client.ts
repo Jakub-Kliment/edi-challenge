@@ -10,19 +10,15 @@
  */
 
 export const CLIENT_TARGET_BYTES = 20_000;
-// PNG (see comment on IMAGE_TYPE) is lossless: canvas.toBlob's quality
-// argument is ignored for image/png, so QUALITIES below is a no-op loop kept
-// only so the retry structure matches the server. Resolution is the only real
-// lever, hence the ladder reaching further down than it would for a lossy
-// format.
-const SIZES = [400, 340, 280, 220, 160, 120, 96, 64];
+// JPEG's quality argument genuinely trades against size in canvas.toBlob
+// (unlike PNG, where it is ignored), so most images fit at full 400px just by
+// stepping quality down. Mirrors lib/image-server.ts — see the comment there
+// for why JPEG and not WebP/PNG.
+const SIZES = [400, 340, 280, 220, 160];
 const QUALITIES = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3];
 
 export type ClientImage = { dataUri: string; bytes: number; width: number; quality: number };
 
-/** PNG, matching the server: librsvg does not render embedded WebP <image>
- *  elements, so the badge's image panel would be blank in any SVG rasterizer.
- *  See lib/image-server.ts for the full explanation. */
 
 function drawCover(img: HTMLImageElement, size: number): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
@@ -37,7 +33,7 @@ function drawCover(img: HTMLImageElement, size: number): HTMLCanvasElement {
   return canvas;
 }
 
-const IMAGE_TYPE = "image/png";
+const IMAGE_TYPE = "image/jpeg";
 
 const toBlob = (canvas: HTMLCanvasElement, type: string, q: number) =>
   new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, q));

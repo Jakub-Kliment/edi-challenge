@@ -1,134 +1,265 @@
 /*
- * Deliberately restrained: strong grid, real typographic hierarchy, one accent.
- * The example in the brief was neon-cyberpunk; this is closer to how a Swiss
- * engineering firm actually presents itself, and it makes the badge the loudest
- * thing on the page rather than the chrome around it.
+ * Vaporwave / retro-futurism. A deliberate departure from the neon-cyberpunk
+ * sample in the brief and from the Swiss-minimal look this app shipped with
+ * earlier — sunset gradients, chrome text, a perspective grid horizon,
+ * scanlines. The badge itself (shared/badge-template.ts) established the
+ * palette; everything here extends it to the rest of the page so the whole
+ * app reads as one aesthetic instead of a themed card sitting in a plain UI.
  */
 :root {
-  --ground: #0b1a2f;
-  --surface: #102741;
-  --surface-2: #16334f;
-  --hairline: #1e3a5f;
-  --text: #f5f7fa;
-  --muted: #8fa3bf;
-  --accent: #e2001a;
-  --ok: #34d399;
-  --warn: #fbbf24;
+  --sky-top: #180a30;
+  --sky-mid: #3a1256;
+  --sky-bottom: #7c1f6e;
+  --surface: #1a0b33;
+  --surface-2: #2b1055;
+  --hairline: #4a2a6b;
+  --text: #fdf4ff;
+  --muted: #c9a8e0;
+  --chrome-1: #ff8bd6;
+  --chrome-2: #7ee8ff;
+  --sun-core: #ffd66b;
+  --sun-edge: #ff5f9e;
+  --grid: #20e3c2;
+  --ok: #4dffb0;
+  --warn: #ffd66b;
   --radius: 10px;
-  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  --font: var(--font-display), "Arial Black", Helvetica, sans-serif;
+  --mono: var(--font-mono-vw), Menlo, Consolas, monospace;
 }
 
 * { box-sizing: border-box; }
 
+html { scroll-behavior: smooth; }
+
 body {
   margin: 0;
-  background: var(--ground);
+  background:
+    radial-gradient(900px 500px at 50% -10%, rgba(255, 214, 107, .1), transparent 60%),
+    linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 55%, var(--sky-bottom) 100%);
+  background-attachment: fixed;
   color: var(--text);
-  font-family: var(--font);
+  font-family: var(--mono);
   -webkit-font-smoothing: antialiased;
   line-height: 1.5;
+  position: relative;
+  min-height: 100vh;
 }
 
-.shell { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+/* Faint scanline texture over everything — subtle, not arcade-cabinet loud. */
+body::before {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 1;
+  background: repeating-linear-gradient(
+    to bottom, rgba(255,255,255,.025) 0px, rgba(255,255,255,.025) 1px,
+    transparent 1px, transparent 3px
+  );
+}
 
-.masthead { border-bottom: 1px solid var(--hairline); padding-bottom: 20px; margin-bottom: 32px; }
-.masthead h1 { margin: 0 0 6px; font-size: 26px; letter-spacing: -0.4px; }
-.masthead p { margin: 0; color: var(--muted); font-size: 14px; max-width: 62ch; }
-.accent-rule { height: 4px; width: 56px; background: var(--accent); margin-bottom: 18px; }
+.shell { max-width: 1180px; margin: 0 auto; padding: 40px 24px 90px; position: relative; z-index: 2; }
 
-.columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 460px); gap: 40px; align-items: start; }
+.masthead { border-bottom: 1px solid var(--hairline); padding-bottom: 22px; margin-bottom: 30px; }
+.masthead h1 {
+  margin: 0; font-family: var(--font); font-weight: 900; font-size: 30px;
+  letter-spacing: .5px; text-transform: uppercase;
+  background: linear-gradient(90deg, var(--chrome-1), var(--chrome-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 18px rgba(255, 139, 214, .35));
+}
+.accent-rule {
+  height: 4px; width: 64px; margin-bottom: 18px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--chrome-1), var(--chrome-2));
+  box-shadow: 0 0 16px rgba(126, 232, 255, .5);
+}
+
+.columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 460px); gap: 48px; align-items: start; }
 @media (max-width: 940px) { .columns { grid-template-columns: 1fr; } }
 
-.panel { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 22px; }
-.panel + .panel { margin-top: 20px; }
-.panel h2 { margin: 0 0 4px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-.panel .hint { margin: 0 0 18px; font-size: 13px; color: var(--muted); }
+.form-flow { display: flex; flex-direction: column; }
 
 .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
 
-.field { margin-bottom: 14px; position: relative; }
-.field label { display: block; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
-.field input, .field textarea {
-  width: 100%; padding: 10px 12px; background: var(--ground);
-  border: 1px solid var(--hairline); border-radius: 8px; color: var(--text);
-  font-size: 14px; font-family: inherit; transition: border-color .15s;
+.field { margin-bottom: 18px; position: relative; }
+.field label {
+  display: block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 7px; font-weight: 700;
 }
-.field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); }
+.field label::before { content: "> "; color: var(--grid); }
+.field input, .field textarea {
+  width: 100%; padding: 11px 13px; background: rgba(26, 11, 51, .6);
+  border: 1px solid var(--hairline); border-radius: 4px; color: var(--text);
+  font-size: 14px; font-family: var(--mono); transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.field input::placeholder, .field textarea::placeholder { color: #6b4d8a; }
+.field input:hover, .field textarea:hover { border-color: var(--chrome-2); }
+.field input:focus, .field textarea:focus {
+  outline: none; border-color: var(--chrome-2); background: rgba(43, 16, 85, .8);
+  box-shadow: 0 0 0 3px rgba(126, 232, 255, .18), 0 0 24px rgba(126, 232, 255, .12);
+}
 .field textarea { resize: vertical; min-height: 68px; }
 .field input.mono { font-family: var(--mono); font-size: 13px; }
 .field .counter { position: absolute; right: 0; top: 0; font-size: 10px; color: var(--muted); }
-.field .counter.over { color: var(--accent); }
-.error { color: var(--accent); font-size: 12px; margin-top: 5px; }
-
-.suggestions {
-  position: absolute; z-index: 20; left: 0; right: 0; top: 100%; margin-top: 4px;
-  background: var(--surface-2); border: 1px solid var(--hairline);
-  border-radius: 8px; overflow: hidden; box-shadow: 0 12px 32px rgba(0,0,0,.45);
-}
-.suggestion { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 12px; cursor: pointer; border: none; background: none; width: 100%; text-align: left; color: var(--text); }
-.suggestion:hover { background: var(--ground); }
-.suggestion .nick { font-size: 13px; }
-.suggestion .addr { font-family: var(--mono); font-size: 11px; color: var(--muted); }
-.suggestion .kill { color: var(--muted); font-size: 15px; padding: 0 4px; background: none; border: none; cursor: pointer; }
-.suggestion .kill:hover { color: var(--accent); }
-
-.inline-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-.chip { font-size: 11px; padding: 4px 9px; border-radius: 999px; border: 1px solid var(--hairline); background: var(--ground); color: var(--muted); cursor: pointer; }
-.chip:hover { border-color: var(--accent); color: var(--text); }
+.field .counter.over { color: var(--sun-edge); }
+.error { color: var(--sun-edge); font-size: 12px; margin-top: 5px; }
 
 .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
-.tab { flex: 1; padding: 8px; font-size: 12px; border-radius: 8px; border: 1px solid var(--hairline); background: var(--ground); color: var(--muted); cursor: pointer; }
-.tab.on { border-color: var(--accent); color: var(--text); background: var(--surface-2); }
+.tab {
+  flex: 1; padding: 8px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  border-radius: 4px; border: 1px solid var(--hairline); background: rgba(26, 11, 51, .5);
+  color: var(--muted); cursor: pointer; transition: border-color .15s, color .15s;
+}
+.tab:hover { color: var(--text); }
+.tab.on { border-color: var(--chrome-2); color: var(--text); background: rgba(126, 232, 255, .08); }
 
-.dropzone { border: 1px dashed var(--hairline); border-radius: 8px; padding: 22px; text-align: center; cursor: pointer; color: var(--muted); font-size: 13px; }
-.dropzone:hover, .dropzone.hot { border-color: var(--accent); color: var(--text); }
+.dropzone {
+  border: 1px dashed var(--hairline); border-radius: 4px; padding: 22px; text-align: center;
+  cursor: pointer; color: var(--muted); font-size: 13px; transition: border-color .15s, background .15s;
+}
+.dropzone:hover, .dropzone.hot { border-color: var(--chrome-2); color: var(--text); background: rgba(126, 232, 255, .05); }
 
 .imgstat { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 8px; font-family: var(--mono); }
 .imgstat .good { color: var(--ok); }
 
-.mint { width: 100%; padding: 14px; font-size: 14px; font-weight: 600; letter-spacing: .4px;
-  background: var(--accent); color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: opacity .15s; }
-.mint:hover:not(:disabled) { opacity: .9; }
-.mint:disabled { opacity: .4; cursor: not-allowed; }
+.mint {
+  width: 100%; padding: 16px; font-size: 14px; font-weight: 900; letter-spacing: 2px;
+  text-transform: uppercase; font-family: var(--font);
+  background: linear-gradient(90deg, var(--sun-edge), var(--chrome-1) 50%, var(--chrome-2));
+  color: #180a30; border: none; border-radius: 4px; cursor: pointer;
+  margin-top: 6px; transition: opacity .15s, transform .1s, box-shadow .15s;
+  box-shadow: 0 0 30px -6px rgba(255, 139, 214, .55);
+}
+.mint:hover:not(:disabled) { opacity: .92; box-shadow: 0 0 40px -4px rgba(126, 232, 255, .55); }
+.mint:active:not(:disabled) { transform: translateY(1px); }
+.mint:disabled { opacity: .3; cursor: not-allowed; box-shadow: none; }
 
-.preview-wrap { position: sticky; top: 24px; }
-.preview-frame { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 16px; }
-.preview-frame img { width: 100%; border-radius: 6px; display: block; }
-.preview-note { font-size: 11px; color: var(--muted); margin-top: 10px; text-align: center; line-height: 1.6; }
+/* Badge preview: floats gently, tilts toward the cursor. Purely visual — the
+   bytes underneath never change. */
+.preview-wrap { position: sticky; top: 24px; perspective: 1200px; }
+/* Owns the slow float loop (transform: translateY) and is the positioning
+   root for the corner zones below — a separate element from the tilt so
+   the float and tilt transforms never collide on one node. */
+.preview-float {
+  position: relative;
+  animation: float 6s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+/* The tilt: pure CSS, no JS pointer-tracking (see BadgePreview.tsx for the
+   full reasoning). Four invisible quadrant zones sit over the card as
+   siblings before .preview-frame; hovering one drives a different
+   rotateX/rotateY on it via a sibling combinator, so the tilt direction
+   genuinely corresponds to which corner the cursor is over. A transition
+   is safe here because :hover is one discrete state change per zone, not a
+   value updating on every pointer-move event. */
+.preview-zone { position: absolute; width: 50%; height: 50%; z-index: 2; }
+.preview-zone-tl { top: 0; left: 0; }
+.preview-zone-tr { top: 0; right: 0; }
+.preview-zone-bl { bottom: 0; left: 0; }
+.preview-zone-br { bottom: 0; right: 0; }
+/* .preview-frame is the ONE element that tilts AND carries the visual frame
+   (rounded corners via the <img> below, border, shadow) — deliberately not
+   split across a separate overflow:hidden clipping parent. Clipping needs
+   overflow:hidden, which forces transform-style back to flat per spec; a
+   version that split the frame styling onto a non-tilting wrapper produced
+   exactly that: a border/shadow "frame" that stayed visually still while
+   only the image inside it tilted, because the clipping box itself never
+   rotated. The SVG badge is already a plain rectangle with no rounding of
+   its own, so rounding the <img> directly (below) gives the same look
+   without any clipping ancestor being needed at all. */
+.preview-frame {
+  transform-style: preserve-3d;
+  cursor: pointer;
+  transition: transform .45s cubic-bezier(.22,1,.36,1), filter .35s ease-out;
+  filter: drop-shadow(0 30px 70px rgba(0,0,0,.7));
+}
+.preview-frame:hover { filter: drop-shadow(0 40px 90px rgba(126, 232, 255, .35)); }
+/* Sibling combinator (~), not :has(): the zones are direct siblings placed
+   before .preview-frame in the DOM (see BadgePreview.tsx), which is what ~
+   requires. :has() was tried first — it reported a true match via both
+   .matches() and the live CSSOM rule list, yet the transform never
+   actually painted, in a way that held up under direct testing and did not
+   match a known documented cause. Rather than keep chasing an engine-level
+   edge case blind, switched to ~, an older and more universally
+   battle-tested selector for exactly this pattern. */
+.preview-zone-tl:hover ~ .preview-frame { transform: rotateX(9deg) rotateY(-11deg); }
+.preview-zone-tr:hover ~ .preview-frame { transform: rotateX(9deg) rotateY(11deg); }
+.preview-zone-bl:hover ~ .preview-frame { transform: rotateX(-9deg) rotateY(-11deg); }
+.preview-zone-br:hover ~ .preview-frame { transform: rotateX(-9deg) rotateY(11deg); }
+.preview-frame img {
+  width: 100%; display: block; position: relative; z-index: 1;
+  border-radius: var(--radius);
+  outline: 1px solid var(--hairline);
+  outline-offset: -1px;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .preview-float { animation: none; }
+  .preview-frame { transition: none; }
+}
 
 .result { border-radius: var(--radius); padding: 18px; margin-top: 18px; border: 1px solid; }
-.result.ok { border-color: var(--ok); background: rgba(52,211,153,.08); }
-.result.bad { border-color: var(--accent); background: rgba(226,0,26,.08); }
-.result h3 { margin: 0 0 10px; font-size: 14px; }
+.result.ok { border-color: var(--ok); background: rgba(77,255,176,.08); }
+.result.bad { border-color: var(--sun-edge); background: rgba(255,95,158,.08); }
+.result h3 { margin: 0 0 10px; font-size: 14px; font-family: var(--font); letter-spacing: .5px; }
 .result dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 12px; font-size: 12px; }
 .result dt { color: var(--muted); }
 .result dd { margin: 0; font-family: var(--mono); word-break: break-all; }
 .result a { color: var(--ok); }
 
-.netbar { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--muted); margin-bottom: 20px; }
-.netbar .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); }
-.netbar select { background: var(--surface); color: var(--text); border: 1px solid var(--hairline); border-radius: 6px; padding: 4px 8px; font-size: 11px; font-family: inherit; }
-.netbar .dot.dot-warn { background: var(--warn); }
+/* Network switch: segmented, sliding chrome-gradient highlight. */
+.switch-row { display: flex; align-items: center; gap: 12px; margin-bottom: 34px; flex-wrap: wrap; }
+.net-switch {
+  position: relative; display: inline-flex; padding: 3px;
+  background: rgba(26, 11, 51, .6); border: 1px solid var(--hairline); border-radius: 999px;
+}
+.net-switch button {
+  position: relative; z-index: 1; border: none; background: none; cursor: pointer;
+  padding: 8px 18px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted); border-radius: 999px; transition: color .2s; font-family: var(--mono);
+}
+.net-switch button.active { color: #180a30; }
+.net-switch-thumb {
+  position: absolute; top: 3px; left: 3px; bottom: 3px; width: calc(50% - 3px);
+  background: linear-gradient(90deg, var(--sun-core), var(--chrome-1));
+  border-radius: 999px;
+  box-shadow: 0 0 20px -2px rgba(255, 139, 214, .6);
+  transition: transform .25s cubic-bezier(.4,0,.2,1);
+}
+.net-switch-thumb.on-mainnet { transform: translateX(100%); background: linear-gradient(90deg, var(--chrome-1), var(--chrome-2)); }
 .netbar-note { color: var(--warn); font-size: 11px; }
 
-.spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: -2px; margin-right: 7px; }
+.spinner {
+  display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(24,10,48,.3);
+  border-top-color: #180a30; border-radius: 50%; animation: spin .7s linear infinite;
+  vertical-align: -2px; margin-right: 7px;
+}
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* Crop modal (Bonus A) */
 .crop-overlay {
   position: fixed; inset: 0; z-index: 100;
-  background: rgba(4, 10, 18, .82); backdrop-filter: blur(2px);
+  background: rgba(12, 4, 26, .85); backdrop-filter: blur(3px);
   display: flex; align-items: center; justify-content: center; padding: 24px;
 }
 .crop-panel {
   width: 100%; max-width: 440px; background: var(--surface);
   border: 1px solid var(--hairline); border-radius: var(--radius);
   overflow: hidden; display: flex; flex-direction: column;
+  box-shadow: 0 0 60px -10px rgba(255, 139, 214, .3);
 }
-.crop-stage { position: relative; width: 100%; height: 360px; background: #000; }
+.crop-stage { position: relative; width: 100%; height: 360px; background: #0c0418; }
 .crop-controls { padding: 16px 18px; }
-.crop-zoom-label { display: flex; align-items: center; gap: 10px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-.crop-zoom-label input[type="range"] { flex: 1; accent-color: var(--accent); }
+.crop-zoom-label {
+  display: flex; align-items: center; gap: 10px; font-size: 11px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted); font-weight: 700;
+}
+.crop-zoom-label input[type="range"] { flex: 1; accent-color: var(--chrome-2); }
 .crop-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+.chip {
+  font-size: 11px; padding: 8px 16px; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase;
+  border: 1px solid var(--hairline); background: rgba(26, 11, 51, .5); color: var(--muted);
+  cursor: pointer; font-family: var(--mono); transition: border-color .15s, color .15s;
+}
+.chip:hover { border-color: var(--chrome-2); color: var(--text); }

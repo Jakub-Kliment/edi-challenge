@@ -35,8 +35,19 @@ export function ImageInput({
     setLocalError(undefined);
     if (!/^https:\/\/.+/.test(value)) { onImage(null); return; }
     setBusy(true);
-    // May return null if CORS blocks canvas access — the server will fetch it.
-    onImage(await processUrl(value));
+    const result = await processUrl(value);
+    onImage(result);
+    // A browser <img> load failure does not say WHY — CORS blocking and a
+    // genuinely dead/non-image link raise the identical generic error, by
+    // design (browsers do not leak that information to page script). So this
+    // cannot reliably tell "harmless CORS" from "this link is actually bad"
+    // client-side. Rather than staying silent either way (which left a user
+    // pasting a broken link with no signal until they pressed Mint and hit a
+    // server round-trip), show a neutral heads-up so they are not confused by
+    // an unexplained blank preview — the server is still the final check.
+    if (result === null) {
+      setLocalError("Could not preview this image locally — it may still work when you mint, or the link may not point to an image.");
+    }
     setBusy(false);
   };
 
