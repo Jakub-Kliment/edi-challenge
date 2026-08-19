@@ -6,7 +6,7 @@ badge" to any wallet address — no wallet connection, login, or gas required
 from the user.
 
 **Live app:** https://edi-badge-minter.vercel.app
-**Contract (Polygon Amoy testnet):** `0xD86F34D8113D8275d52903D1fA012bC40c00Baa1`
+**Contract (Polygon Amoy testnet):** `0x9b3aE52F3d5266A06C069EAf3aC050D6E13Fb696`
 
 ## How it works
 
@@ -45,18 +45,3 @@ npm run compile           # compile the contract
 npm run deploy:amoy       # deploy ExitBadge to Polygon Amoy
 npm run gen:abi           # regenerate lib/abi.ts from the compiled artifact
 ```
-
-## Notable decisions
-
-- **JPEG, not PNG or WebP, for the embedded image.** WebP doesn't decode
-  inside an SVG `<image>` element in common rasterizers (renders blank).
-  PNG is lossless with no quality lever, so hard-to-compress sources were
-  forced down to a tiny resolution to fit the on-chain size budget. JPEG's
-  quality/size tradeoff keeps full resolution on those images.
-- **SSRF-safe image fetching.** The mint endpoint accepts an arbitrary URL
-  from anonymous users, so it resolves and validates the target IP, refuses
-  to follow redirects (which could otherwise smuggle a request to a private
-  address past the check), and sniffs the real file type from magic bytes
-  rather than trusting the `Content-Type` header.
-- **Pure-CSS tilt effect** on the live preview — no pointer-tracking JS, so
-  there's no event stream to desync or get stuck.
