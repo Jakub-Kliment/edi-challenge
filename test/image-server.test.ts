@@ -16,11 +16,11 @@ describe("image pipeline", () => {
     const out = await processImage(await makeImage(2400, 1600));
     assert.ok(out.bytes.length <= TARGET_BYTES, `got ${out.bytes.length}`);
     // JPEG, not WebP or PNG. WebP: librsvg does not decode WebP embedded in
-    // an SVG <image> element (D22 in DECISIONS.md) — the photo panel renders
-    // blank in any SVG-based renderer despite the bytes being stored
-    // correctly. PNG (the first fix) renders correctly but is lossless, so
-    // hard-to-compress images (e.g. a low-res thumbnail) were forced down to
-    // as little as 160px to hit budget — see the dedicated test below and D39.
+    // an SVG <image> element — the photo panel renders blank in any
+    // SVG-based renderer despite the bytes being stored correctly. PNG (the
+    // first fix) renders correctly but is lossless, so hard-to-compress
+    // images (e.g. a low-res thumbnail) were forced down to as little as
+    // 160px to hit budget — see the dedicated test below.
     assert.equal(out.mimeId, 2);
     assert.equal(out.mime, "image/jpeg");
     console.log(`\n  2400x1600 -> ${out.width}px q${out.quality}, ${out.bytes.length} bytes`);

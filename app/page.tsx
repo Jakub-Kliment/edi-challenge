@@ -18,10 +18,9 @@ const PLACEHOLDER_IMAGE =
 const today = () => new Date().toISOString().slice(0, 10);
 
 // Reflects the actual state of the relayer, not just a feature flag: the
-// mainnet contract has been deliberately left undeployed and unfunded (see
-// DECISIONS.md) rather than spending real POL to complete a bonus feature.
-// NEXT_PUBLIC_* vars are inlined by Next at build time, so this is safe to
-// read directly.
+// mainnet contract has been deliberately left undeployed and unfunded rather
+// than spending real POL to complete a bonus feature. NEXT_PUBLIC_* vars are
+// inlined by Next at build time, so this is safe to read directly.
 const MAINNET_ENABLED = process.env.NEXT_PUBLIC_MAINNET_ENABLED === "true";
 
 export default function Home() {

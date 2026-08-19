@@ -14,9 +14,9 @@
  *
  * Everything here is standard SVG primitives (gradients, shapes, paths) —
  * no embedded fonts, no filters that depend on a specific rasterizer. The
- * on-chain image field IS embedded raster bytes (see D22 in the private
- * decision log: WebP doesn't decode inside SVG <image>, so PNG is used and
- * the bytes are baked in as a data URI) — that part of the composition is
+ * on-chain image field IS embedded raster bytes, baked in as a data URI
+ * (WebP doesn't decode inside an SVG <image> element in common rasterizers,
+ * so the pipeline encodes JPEG instead) — that part of the composition is
  * unrelated to this redesign and unchanged.
  */
 
