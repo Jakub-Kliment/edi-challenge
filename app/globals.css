@@ -263,3 +263,32 @@ body::before {
   cursor: pointer; font-family: var(--mono); transition: border-color .15s, color .15s;
 }
 .chip:hover { border-color: var(--chrome-2); color: var(--text); }
+
+.hint { color: var(--muted); font-size: 12px; }
+
+/* Gallery: the last 20 minted badges, walked from the chain on each request
+   (see app/gallery/page.tsx) — no separate database. */
+.gallery-masthead { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.gallery-back {
+  color: var(--chrome-2); font-size: 12px; font-family: var(--mono); text-decoration: none;
+  border-bottom: 1px solid transparent; transition: border-color .15s;
+}
+.gallery-back:hover { border-color: var(--chrome-2); }
+
+.gallery-filter { max-width: 360px; margin-bottom: 28px; }
+
+.gallery-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 22px;
+}
+.gallery-card {
+  display: block; text-decoration: none; color: inherit;
+  border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden;
+  background: rgba(26, 11, 51, .4); transition: border-color .2s, transform .2s;
+}
+.gallery-card:hover { border-color: var(--chrome-2); transform: translateY(-2px); }
+.gallery-card-frame { aspect-ratio: 1 / 1; background: var(--surface); }
+.gallery-card-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gallery-card-meta { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 3px; }
+.gallery-card-title { font-family: var(--font); font-size: 13px; letter-spacing: .3px; color: var(--text); }
+.gallery-card-sub { font-size: 11px; color: var(--sun-core); font-family: var(--mono); }
+.gallery-card-owner { font-size: 10px; color: var(--muted); }

@@ -113,8 +113,9 @@ export default function Home() {
   return (
     <main className="shell">
       <div className="accent-rule" />
-      <header className="masthead">
+      <header className="masthead gallery-masthead">
         <h1>On-chain completion badges</h1>
+        <a href="/gallery" className="gallery-back">View gallery →</a>
       </header>
 
       <div className="switch-row">
